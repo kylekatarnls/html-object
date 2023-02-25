@@ -1,13 +1,18 @@
 # HTMLObject
 
-[![Build Status](http://img.shields.io/travis/Anahkiasen/html-object.svg?style=flat)](https://travis-ci.org/Anahkiasen/html-object)
-[![Latest Stable Version](http://img.shields.io/packagist/v/anahkiasen/html-object.svg?style=flat)](https://packagist.org/packages/anahkiasen/html-object)
-[![Total Downloads](http://img.shields.io/packagist/dt/anahkiasen/html-object.svg?style=flat)](https://packagist.org/packages/anahkiasen/html-object)
-[![Scrutinizer Quality Score](http://img.shields.io/scrutinizer/g/Anahkiasen/html-object.svg?style=flat)](https://scrutinizer-ci.com/g/Anahkiasen/html-object/)
-[![Code Coverage](http://img.shields.io/scrutinizer/coverage/g/Anahkiasen/html-object.svg?style=flat)](https://scrutinizer-ci.com/g/Anahkiasen/html-object/)
-[![Support via Gittip](http://img.shields.io/gittip/Anahkiasen.svg?style=flat)](https://www.gittip.com/Anahkiasen/)
+[![Unit tests](https://github.com/kylekatarnls/html-object/actions/workflows/test.yml/badge.svg)](https://github.com/kylekatarnls/html-object/actions)
+[![Latest Stable Version](http://img.shields.io/packagist/v/kylekatarnls/html-object.svg?style=flat)](https://packagist.org/packages/kylekatarnls/html-object)
+[![codecov.io](https://img.shields.io/codecov/c/github/kylekatarnls/html-object.svg)](https://app.codecov.io/gh/kylekatarnls/html-object)
 
 HTMLObject is a set of classes to create and manipulate HTML objects abstractions.
+
+Forked from [Anahkiasen/html-object](https://github.com/Anahkiasen/html-object)
+
+## Install
+
+```
+composer require kylekatarnls/html-object
+```
 
 ## Static calls to the classes
 
