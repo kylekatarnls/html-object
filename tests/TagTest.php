@@ -224,6 +224,15 @@ class TagTest extends HtmlObjectTestCase
 
         $this->assertEquals('<p class="bar">foo</p>', $this->getObject()->render());
     }
+        
+    public function testCannotRemoveWrongClasses()
+    {
+        $this->object->addClass('foo');
+        $this->object->addClass('bar');
+        $this->object->removeClass('unknow');
+
+        $this->assertEquals('<p class="foo bar">foo</p>', $this->object->render());
+    }
 
     public function testCanManuallyOpenElement()
     {
