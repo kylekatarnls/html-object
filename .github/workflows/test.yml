@@ -42,7 +42,7 @@ jobs:
           restore-keys: ${{ runner.os }}-${{ matrix.php }}-${{ matrix.setup }}-composer-
 
       - name: Set PHPUnit version
-        if: matrix.php >= 7.2 && matrix.php < 8.0
+        if: matrix.php >= 7.1 && matrix.php < 8.0
         run: composer require --no-update phpunit/phpunit:^5.7.27 --no-interaction --dev
 
       - name: Set PHPUnit version

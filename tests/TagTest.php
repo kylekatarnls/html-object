@@ -24,9 +24,16 @@ class Icon extends Tag
 
 class TagTest extends HtmlObjectTestCase
 {
-    public function setUp()
+    /** @var Element */
+    private $object;
+
+    private function getObject()
     {
-        $this->object = new Element('p', 'foo');
+        if (!isset($this->object)) {
+            $this->object = new Element('p', 'foo');
+        }
+
+        return $this->object;
     }
 
     public function testCanCreateCustomElementClasses()
@@ -38,7 +45,7 @@ class TagTest extends HtmlObjectTestCase
 
     public function testCanCreateHtmlObject()
     {
-        $this->assertHTML($this->getMatcher(), $this->object);
+        $this->assertHTML($this->getMatcher(), $this->getObject());
     }
 
     public function testCanCreateDefaultElement()
@@ -48,84 +55,87 @@ class TagTest extends HtmlObjectTestCase
 
     public function testCanUseXhtmlStandards()
     {
+        $previous = Tag::$config['doctype'];
         Tag::$config['doctype'] = 'xhtml';
         $field = Input::hidden('foo', 'bar');
+        $xhtml = $field->render();
+        Tag::$config['doctype'] = $previous;
 
-        $this->assertContains(' />', $field->render());
+        $this->assertSame(' />', substr($xhtml, -3), 'Tag should end with " />"');
     }
 
     public function testCanSetAnAttribute()
     {
-        $this->object->setAttribute('data-foo', 'bar');
+        $this->getObject()->setAttribute('data-foo', 'bar');
         $matcher = $this->getMatcher();
         $matcher['attributes']['data-foo'] = 'bar';
 
-        $this->assertHTML($matcher, $this->object);
+        $this->assertHTML($matcher, $this->getObject());
     }
 
     public function testCanSetJsonAttributes()
     {
         $json = '{"foo":"bar","baz":"qux"}';
-        $this->object->dataTags($json);
+        $this->getObject()->dataTags($json);
         $matcher = $this->getMatcher();
         $matcher['attributes']['data-tags'] = $json;
 
-        $this->assertHTML($matcher, $this->object);
-        $this->assertEquals("<p data-tags='".$json."'>foo</p>", $this->object->render());
+        $this->assertHTML($matcher, $this->getObject());
+        $this->assertEquals("<p data-tags='".$json."'>foo</p>", $this->getObject()->render());
 
         $json = '["foo", "bar", "baz"]';
-        $this->object->dataTags($json);
+        $this->getObject()->dataTags($json);
         $matcher = $this->getMatcher();
         $matcher['attributes']['data-tags'] = $json;
 
-        $this->assertHTML($matcher, $this->object);
-        $this->assertEquals("<p data-tags='".$json."'>foo</p>", $this->object->render());
+        $this->assertHTML($matcher, $this->getObject());
+        $this->assertEquals("<p data-tags='".$json."'>foo</p>", $this->getObject()->render());
     }
 
     public function testCanGetAttributes()
     {
-        $this->object->setAttribute('data-foo', 'bar');
+        $this->getObject()->setAttribute('data-foo', 'bar');
 
-        $this->assertEquals(array('data-foo' => 'bar'), $this->object->getAttributes());
+        $this->assertEquals(array('data-foo' => 'bar'), $this->getObject()->getAttributes());
     }
 
     public function testCanGetAttribute()
     {
-        $this->object->setAttribute('data-foo', 'bar');
+        $this->getObject()->setAttribute('data-foo', 'bar');
 
-        $this->assertEquals('bar', $this->object->getAttribute('data-foo'));
+        $this->assertEquals('bar', $this->getObject()->getAttribute('data-foo'));
     }
 
     public function testCanDynamicallySetAttributes()
     {
-        $this->object->data_foo('bar');
-        $this->object->foo = 'bar';
+        $this->getObject()->data_foo('bar');
+        $this->getObject()->foo = 'bar';
 
         $matcher = $this->getMatcher();
         $matcher['attributes']['data-foo'] = 'bar';
         $matcher['attributes']['foo'] = 'bar';
 
-        $this->assertHTML($matcher, $this->object);
+        $this->assertHTML($matcher, $this->getObject());
     }
 
     public function testCanDynamicallySetAttributeWithCamelCase()
     {
-        $this->object->dataFoo('bar');
-        $this->object->foo = 'bar';
+        $this->getObject()->dataFoo('bar');
+        $this->getObject()->foo = 'bar';
 
         $matcher = $this->getMatcher();
         $matcher['attributes']['data-foo'] = 'bar';
         $matcher['attributes']['foo'] = 'bar';
 
-        $this->assertHTML($matcher, $this->object);
+        $this->assertHTML($matcher, $this->getObject());
     }
 
     public function testCanDynamicallySetBooleanAttributesByDefault()
     {
-        $this->object->required();
+        $this->getObject()->required();
 
         // cannot use assertHTML; it uses assertTag, which cannot find boolean attributes
-        $this->assertEquals('<p required>foo</p>', $this->object->render());
+        $this->assertEquals('<p required>foo</p>', $this->getObject()->render());
     }
 
     public function testCanDynamicallyGetChild()
@@ -139,99 +149,99 @@ class TagTest extends HtmlObjectTestCase
 
     public function testCanReplaceAttributes()
     {
-        $this->object->setAttribute('data-foo', 'bar');
-        $this->object->replaceAttributes(array('foo' => 'bar'));
+        $this->getObject()->setAttribute('data-foo', 'bar');
+        $this->getObject()->replaceAttributes(array('foo' => 'bar'));
 
         $matcher = $this->getMatcher();
         $matcher['attributes']['foo'] = 'bar';
 
-        $this->assertHTML($matcher, $this->object);
+        $this->assertHTML($matcher, $this->getObject());
     }
 
     public function testCanMergeAttributes()
     {
-        $this->object->setAttribute('data-foo', 'bar');
-        $this->object->setAttributes(array('foo' => 'bar'));
+        $this->getObject()->setAttribute('data-foo', 'bar');
+        $this->getObject()->setAttributes(array('foo' => 'bar'));
 
         $matcher = $this->getMatcher();
         $matcher['attributes']['data-foo'] = 'bar';
         $matcher['attributes']['foo'] = 'bar';
 
-        $this->assertHTML($matcher, $this->object);
+        $this->assertHTML($matcher, $this->getObject());
     }
 
     public function testCanAppendClass()
     {
-        $this->object->setAttribute('class', 'foo');
-        $this->object->addClass('foo');
-        $this->object->addClass('bar');
+        $this->getObject()->setAttribute('class', 'foo');
+        $this->getObject()->addClass('foo');
+        $this->getObject()->addClass('bar');
 
         $matcher = $this->getMatcher();
         $matcher['attributes']['class'] = 'foo bar';
 
-        $this->assertHTML($matcher, $this->object);
+        $this->assertHTML($matcher, $this->getObject());
     }
 
     public function testCanFetchAttributes()
     {
-        $this->object->foo('bar');
+        $this->getObject()->foo('bar');
 
-        $this->assertEquals('bar', $this->object->foo);
+        $this->assertEquals('bar', $this->getObject()->foo);
     }
 
     public function testCanChangeElement()
     {
-        $this->object->setElement('strong');
+        $this->getObject()->setElement('strong');
 
-        $this->assertHTML($this->getMatcher('strong', 'foo'), $this->object);
+        $this->assertHTML($this->getMatcher('strong', 'foo'), $this->getObject());
     }
 
     public function testCanChangeValue()
     {
-        $this->object->setValue('bar');
+        $this->getObject()->setValue('bar');
 
-        $this->assertHTML($this->getMatcher('p', 'bar'), $this->object);
+        $this->assertHTML($this->getMatcher('p', 'bar'), $this->getObject());
     }
 
     public function testCanGetValue()
     {
-        $this->assertEquals('foo', $this->object->getValue());
+        $this->assertEquals('foo', $this->getObject()->getValue());
     }
 
     public function testSimilarClassesStillGetAdded()
     {
-        $this->object->addClass('alert-success');
-        $this->object->addClass('alert');
+        $this->getObject()->addClass('alert-success');
+        $this->getObject()->addClass('alert');
 
-        $this->assertEquals('<p class="alert-success alert">foo</p>', $this->object->render());
+        $this->assertEquals('<p class="alert-success alert">foo</p>', $this->getObject()->render());
     }
 
     public function testCanRemoveClasses()
     {
-        $this->object->addClass('foo');
-        $this->object->addClass('bar');
-        $this->object->removeClass('foo');
+        $this->getObject()->addClass('foo');
+        $this->getObject()->addClass('bar');
+        $this->getObject()->removeClass('foo');
 
-        $this->assertEquals('<p class="bar">foo</p>', $this->object->render());
+        $this->assertEquals('<p class="bar">foo</p>', $this->getObject()->render());
     }
 
     public function testCanManuallyOpenElement()
     {
-        $element = $this->object->open().'foobar'.$this->object->close();
+        $element = $this->getObject()->open().'foobar'.$this->getObject()->close();
 
         $this->assertEquals('<p>foobar</p>', $element);
     }
 
     public function testCanWrapValue()
     {
-        $this->object->wrapValue('strong');
+        $this->getObject()->wrapValue('strong');
 
-        $this->assertEquals('<p><strong>foo</strong></p>', $this->object->render());
+        $this->assertEquals('<p><strong>foo</strong></p>', $this->getObject()->render());
     }
 
     public function testCanWrapItself()
     {
-        $object = $this->object->wrapWith('div');
+        $object = $this->getObject()->wrapWith('div');
 
         $this->assertEquals('<div><p>foo</p></div>', $object->getParent()->render());
     }
@@ -303,9 +313,9 @@ class TagTest extends HtmlObjectTestCase
 
     public function testCanCheckIfTagIsOpened()
     {
-        $this->object->open();
+        $this->getObject()->open();
 
-        $this->assertTrue($this->object->isOpened());
+        $this->assertTrue($this->getObject()->isOpened());
     }
 
     public function testCanCreateShadowDom()

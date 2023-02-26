@@ -6,48 +6,48 @@ use HtmlObject\TestCases\HtmlObjectTestCase;
 
 class TreeObjectTest extends HtmlObjectTestCase
 {
-    /**
-     * @var Element
-     */
+    /** @var Element */
     private $object;
 
-    public function setUp()
+    private function getObject()
     {
-        parent::setUp();
+        if (!isset($this->object)) {
+            $this->object = new Element('p', 'foo');
+        }
 
-        $this->object = new Element('p', 'foo');
+        return $this->object;
     }
 
     public function testCanNest()
     {
-        $this->object->nest('strong', 'foo');
+        $this->getObject()->nest('strong', 'foo');
 
-        $this->assertEquals('<p>foo<strong>foo</strong></p>', $this->object->render());
+        $this->assertEquals('<p>foo<strong>foo</strong></p>', $this->getObject()->render());
     }
 
     public function testCanNestStrings()
     {
-        $this->object->nest('<strong>foo</strong>');
+        $this->getObject()->nest('<strong>foo</strong>');
 
-        $this->assertEquals('<p>foo<strong>foo</strong></p>', $this->object->render());
+        $this->assertEquals('<p>foo<strong>foo</strong></p>', $this->getObject()->render());
     }
 
     public function testCanNestObjects()
     {
         $object = Element::strong('foo');
-        $this->object->nest($object);
+        $this->getObject()->nest($object);
 
-        $this->assertEquals('<p>foo<strong>foo</strong></p>', $this->object->render());
+        $this->assertEquals('<p>foo<strong>foo</strong></p>', $this->getObject()->render());
     }
 
     public function testCanNestObjectsInChildren()
     {
         $object = Element::strong('foo');
         $link = Element::a('foo');
-        $this->object->nest($object, 'body');
-        $this->object->nest($link, 'body.link');
+        $this->getObject()->nest($object, 'body');
+        $this->getObject()->nest($link, 'body.link');
 
-        $this->assertEquals('<p>foo<strong>foo<a>foo</a></strong></p>', $this->object->render());
+        $this->assertEquals('<p>foo<strong>foo<a>foo</a></strong></p>', $this->getObject()->render());
     }
 
     public function testCanNestStringsInChildren()
@@ -55,26 +55,26 @@ class TreeObjectTest extends HtmlObjectTestCase
         $strong = Element::strong('title');
         $title = Element::h1('bar')->nest($strong, 'strong');
         $object = Element::div()->nest($title, 'title');
-        $this->object->nest($object, 'body');
-        $this->object->nest('by <a>someone</a>', 'body.title');
+        $this->getObject()->nest($object, 'body');
+        $this->getObject()->nest('by <a>someone</a>', 'body.title');
 
-        $this->assertEquals('<p>foo<div><h1>bar<strong>title</strong>by <a>someone</a></h1></div></p>', $this->object->render());
+        $this->assertEquals('<p>foo<div><h1>bar<strong>title</strong>by <a>someone</a></h1></div></p>', $this->getObject()->render());
     }
 
     public function testCanGetNestedElements()
     {
         $object = Element::strong('foo');
-        $this->object->nest($object, 'foo');
+        $this->getObject()->nest($object, 'foo');
 
-        $this->assertEquals($object, $this->object->getChild('foo'));
+        $this->assertEquals($object, $this->getObject()->getChild('foo'));
     }
 
     public function testCanGetChildWithDotsInName()
     {
         $object = Element::p('foo');
-        $this->object->setChild($object, '11:30 a.m.', true);
+        $this->getObject()->setChild($object, '11:30 a.m.', true);
 
-        $this->assertEquals($object, $this->object->getChild('11:30 a.m.'));
+        $this->assertEquals($object, $this->getObject()->getChild('11:30 a.m.'));
     }
 
     public function testCanAppendElementToAll()
@@ -123,116 +123,116 @@ class TreeObjectTest extends HtmlObjectTestCase
 
     public function testCanNestMultipleValues()
     {
-        $this->object->nestChildren(array('strong' => 'foo', 'em' => 'bar'));
+        $this->getObject()->nestChildren(array('strong' => 'foo', 'em' => 'bar'));
 
-        $this->assertEquals('<p>foo<strong>foo</strong><em>bar</em></p>', $this->object->render());
+        $this->assertEquals('<p>foo<strong>foo</strong><em>bar</em></p>', $this->getObject()->render());
     }
 
     public function testWontNestIfTagDoesntExist()
     {
-        $this->object->nest(array('strong' => 'foo', 'foobar' => 'bar'));
+        $this->getObject()->nest(array('strong' => 'foo', 'foobar' => 'bar'));
 
-        $this->assertEquals('<p>foo<strong>foo</strong>bar</p>', $this->object->render());
+        $this->assertEquals('<p>foo<strong>foo</strong>bar</p>', $this->getObject()->render());
     }
 
     public function testCanNestMultipleValuesUsingNest()
     {
-        $this->object->nest(array('strong' => 'foo', 'em' => 'bar'));
+        $this->getObject()->nest(array('strong' => 'foo', 'em' => 'bar'));
 
-        $this->assertEquals('<p>foo<strong>foo</strong><em>bar</em></p>', $this->object->render());
+        $this->assertEquals('<p>foo<strong>foo</strong><em>bar</em></p>', $this->getObject()->render());
     }
 
     public function testCanNestMultipleElements()
     {
         $foo = Element::strong('foo');
         $bar = Element::p('bar');
-        $this->object->nestChildren(array(
+        $this->getObject()->nestChildren(array(
             'foo' => $foo,
             'bar' => $bar,
         ));
 
-        $this->assertEquals($foo, $this->object->getChild('foo'));
-        $this->assertEquals($bar, $this->object->getChild('bar'));
+        $this->assertEquals($foo, $this->getObject()->getChild('foo'));
+        $this->assertEquals($bar, $this->getObject()->getChild('bar'));
     }
 
     public function testCanNestMultipleObjects()
     {
         $strong = Element::strong('foo');
         $em = Element::em('bar');
-        $this->object->nestChildren(array($strong, $em));
+        $this->getObject()->nestChildren(array($strong, $em));
 
-        $this->assertEquals('<p>foo<strong>foo</strong><em>bar</em></p>', $this->object->render());
+        $this->assertEquals('<p>foo<strong>foo</strong><em>bar</em></p>', $this->getObject()->render());
     }
 
     public function testCanWalkTree()
     {
         $strong = Element::strong('foo');
-        $this->object->nest($strong);
+        $this->getObject()->nest($strong);
 
-        $this->assertEquals($this->object, $this->object->getChild(0)->getParent());
+        $this->assertEquals($this->getObject(), $this->getObject()->getChild(0)->getParent());
     }
 
     public function testCanModifyChildren()
     {
         $strong = Element::strong('foo');
-        $this->object->nest($strong);
-        $this->object->getChild(0)->addClass('foo');
+        $this->getObject()->nest($strong);
+        $this->getObject()->getChild(0)->addClass('foo');
 
-        $this->assertEquals('<p>foo<strong class="foo">foo</strong></p>', $this->object->render());
+        $this->assertEquals('<p>foo<strong class="foo">foo</strong></p>', $this->getObject()->render());
     }
 
     public function testCanCrawlToTextNode()
     {
-        $this->object->nest('<strong>foo</strong>');
-        $this->object->getChild(0)->addClass('foo');
+        $this->getObject()->nest('<strong>foo</strong>');
+        $this->getObject()->getChild(0)->addClass('foo');
 
-        $this->assertEquals('<p>foo<strong>foo</strong></p>', $this->object->render());
+        $this->assertEquals('<p>foo<strong>foo</strong></p>', $this->getObject()->render());
     }
 
     public function testCanCrawlSeveralLayersDeep()
     {
         $strong = Element::strong('foo');
         $em = Element::em('bar');
-        $this->object->nest($strong, 'strong')->getChild('strong')->nest($em, 'em');
+        $this->getObject()->nest($strong, 'strong')->getChild('strong')->nest($em, 'em');
 
-        $this->assertEquals('<p>foo<strong>foo<em>bar</em></strong></p>', $this->object->render());
-        $this->assertEquals($em, $this->object->getChild('strong.em'));
+        $this->assertEquals('<p>foo<strong>foo<em>bar</em></strong></p>', $this->getObject()->render());
+        $this->assertEquals($em, $this->getObject()->getChild('strong.em'));
     }
 
     public function testCanCrawlAnonymousLayers()
     {
         $strong = Element::strong('foo');
         $em = Element::em('bar');
-        $this->object->nest($strong)->getChild(0)->nest($em);
+        $this->getObject()->nest($strong)->getChild(0)->nest($em);
 
-        $this->assertEquals('<p>foo<strong>foo<em>bar</em></strong></p>', $this->object->render());
-        $this->assertEquals($em, $this->object->getChild('0.0'));
+        $this->assertEquals('<p>foo<strong>foo<em>bar</em></strong></p>', $this->getObject()->render());
+        $this->assertEquals($em, $this->getObject()->getChild('0.0'));
     }
 
     public function testCanGoBackUpSeveralLevels()
     {
         $strong = Element::strong('foo');
         $em = Element::em('bar');
-        $this->object->nest($strong, 'strong')->getChild('strong')->nest($em, 'em');
-        $child = $this->object->getChild('strong.em');
+        $this->getObject()->nest($strong, 'strong')->getChild('strong')->nest($em, 'em');
+        $child = $this->getObject()->getChild('strong.em');
 
-        $this->assertEquals($child->getParent()->getParent(), $this->object);
+        $this->assertEquals($child->getParent()->getParent(), $this->getObject());
         $this->assertEquals($child->getParent()->getParent(), $child->getParent(1));
     }
 
     public function testCanCheckIfObjectHasParent()
     {
-        $this->object->setParent(Element::div());
+        $this->getObject()->setParent(Element::div());
 
-        $this->assertTrue($this->object->hasParent());
+        $this->assertTrue($this->getObject()->hasParent());
     }
 
     public function testCanCheckIfObjectHasChildren()
     {
-        $this->assertFalse($this->object->hasChildren());
+        $this->assertFalse($this->getObject()->hasChildren());
 
-        $this->object->nest(Element::div());
-        $this->assertTrue($this->object->hasChildren());
+        $this->getObject()->nest(Element::div());
+        $this->assertTrue($this->getObject()->hasChildren());
     }
 
     public function testCanHaveSelfClosingChildren()
@@ -246,12 +246,12 @@ class TreeObjectTest extends HtmlObjectTestCase
 
     public function testCanCheckIfChildrenIsAfterSibling()
     {
-        $this->object->nestChildren(array(
+        $this->getObject()->nestChildren(array(
             'first' => Element::div(),
             'last' => Element::div(),
         ));
-        $first = $this->object->first;
-        $last = $this->object->last;
+        $first = $this->getObject()->first;
+        $last = $this->getObject()->last;
 
         $this->assertTrue($last->isAfter('first'));
         $this->assertFalse($first->isAfter('last'));
@@ -260,9 +260,9 @@ class TreeObjectTest extends HtmlObjectTestCase
     public function testCanCheckIfElementHasChild()
     {
         $element = Element::create('div', 'foo');
-        $this->object->nest($element, 'body');
+        $this->getObject()->nest($element, 'body');
 
-        $this->assertTrue($this->object->hasChild('body'));
-        $this->assertFalse($this->object->hasChild('title'));
+        $this->assertTrue($this->getObject()->hasChild('body'));
+        $this->assertFalse($this->getObject()->hasChild('title'));
     }
 }
